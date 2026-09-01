@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write - Adrián Chávez</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Adrián Chávez Morales</h1>
+    </header>
+    <nav>
+        <a href="index.html#about">About me</a>
+        <a href="index.html#projects">Projects</a>
+        <a href="index.html#experience">Work experience</a>
+        <a href="index.html#skills">Skills</a>
+        <a href="blog.html">Blog</a>
+    </nav>
+    <main>
+        <section class="container blog-container" id="writer-gate">
+            <div class="gate-card">
+                <h2>Writer</h2>
+                <p>This page is not linked from the portfolio. Visitors see the blog, not this editor.</p>
+
+                <form id="setup-form" class="gate-form hidden">
+                    <h3>Create your writer password</h3>
+                    <p class="muted">Choose a password so someone who finds this URL still cannot open the editor.</p>
+                    <label for="setup-password">Password</label>
+                    <input id="setup-password" type="password" autocomplete="new-password" minlength="6" required>
+                    <label for="setup-confirm">Confirm password</label>
+                    <input id="setup-confirm" type="password" autocomplete="new-password" minlength="6" required>
+                    <p id="setup-error" class="form-error"></p>
+                    <button type="submit">Create password</button>
+                </form>
+
+                <form id="login-form" class="gate-form hidden">
+                    <h3>Unlock the editor</h3>
+                    <label for="login-password">Password</label>
+                    <input id="login-password" type="password" autocomplete="current-password" required>
+                    <p id="login-error" class="form-error"></p>
+                    <button type="submit">Unlock</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="container blog-container hidden" id="writer-app">
+            <div class="writer-header">
+                <h2>Write a post</h2>
+                <div class="writer-actions">
+                    <button type="button" id="new-post-btn">New post</button>
+                    <button type="button" id="toggle-settings" class="secondary-btn">Settings</button>
+                    <button type="button" id="sign-out" class="secondary-btn">Sign out</button>
+                </div>
+            </div>
+            <p class="muted">Visitors never see this page in the menu. Publishing updates <code>data/posts.js</code>, which the public blog reads.</p>
+            <p id="writer-status" class="writer-status"></p>
+
+            <div id="settings-panel" class="settings-panel hidden">
+                <h3>Optional: publish from the browser</h3>
+                <p class="muted">Create a GitHub fine-grained token with Contents read/write access only for this repo. It stays in this browser and is never committed with the site.</p>
+                <label for="github-token">GitHub token</label>
+                <input id="github-token" type="password" autocomplete="off" placeholder="github_pat_...">
+                <button type="button" id="save-token">Save token on this computer</button>
+            </div>
+
+            <div class="writer-layout">
+                <aside class="saved-posts-panel">
+                    <h3>Your posts</h3>
+                    <div id="saved-posts"></div>
+                </aside>
+
+                <form id="post-form" class="post-form">
+                    <input type="hidden" id="post-id">
+                    <h3 id="editor-heading">New post</h3>
+                    <label for="post-title">Title</label>
+                    <input id="post-title" type="text" required placeholder="Post title">
+
+                    <label for="post-date">Date</label>
+                    <input id="post-date" type="date" required>
+
+                    <label for="post-excerpt">Short summary (shown on the blog list)</label>
+                    <input id="post-excerpt" type="text" maxlength="220" placeholder="One or two sentences">
+
+                    <label for="post-body">Post</label>
+                    <div class="md-toolbar">
+                        <button type="button" data-md="bold">Bold</button>
+                        <button type="button" data-md="italic">Italic</button>
+                        <button type="button" data-md="heading">Heading</button>
+                        <button type="button" data-md="link">Link</button>
+                        <button type="button" data-md="list">List</button>
+                        <button type="button" data-md="code">Code</button>
+                    </div>
+                    <textarea id="post-body" rows="16" placeholder="Write in plain text. You can use **bold**, *italic*, lists, and [links](https://example.com)."></textarea>
+
+                    <div class="editor-buttons">
+                        <button type="button" id="download-posts">Save post and download file</button>
+                        <button type="button" id="publish-github">Publish to GitHub</button>
+                        <button type="button" id="delete-post" class="danger-btn">Delete post</button>
+                    </div>
+
+                    <h3>Preview</h3>
+                    <div id="post-preview" class="post-body preview-box"></div>
+                </form>
+            </div>
+        </section>
+    </main>
+    <script src="data/posts.js"></script>
+    <script src="js/blog-config.js"></script>
+    <script src="js/blog.js"></script>
+    <script src="js/write.js"></script>
+</body>
+</html>
