@@ -84,15 +84,18 @@ function utf8ToBase64(text) {
 }
 
 function downloadTextFile(filename, content) {
-  const blob = new Blob([content], { type: "text/javascript;charset=utf-8" });
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.download = filename;
+  link.rel = "noopener";
   document.body.appendChild(link);
   link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(function () {
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, 2000);
 }
 
 function serializeConfigFile(passwordHash) {
@@ -244,6 +247,30 @@ function initWriter() {
       fillForm(null);
     }
     renderSavedPosts();
+    refreshLockBanner();
+  }
+
+  function lockFileNeedsSaving() {
+    return Boolean(storedPasswordHash()) && !configuredPasswordHash();
+  }
+
+  function refreshLockBanner() {
+    const banner = document.getElementById("lock-file-banner");
+    if (lockFileNeedsSaving()) show(banner);
+    else hide(banner);
+  }
+
+  function saveLockFile() {
+    const hash = expectedPasswordHash();
+    if (!hash) {
+      setStatus("Create a password first.", "error");
+      return;
+    }
+    downloadTextFile("blog-config.js", serializeConfigFile(hash));
+    setStatus(
+      "If your browser blocked the download, use Copy file contents and paste it into js/blog-config.js.",
+      "success"
+    );
   }
 
   function showGate() {
@@ -267,28 +294,36 @@ function initWriter() {
       setupError.textContent = "The two passwords do not match.";
       return;
     }
-    const hash = await hashPassword(password);
-    localStorage.setItem(STORAGE_KEYS.passwordHash, hash);
-    downloadTextFile("blog-config.js", serializeConfigFile(hash));
-    setUnlocked(true);
-    showApp();
-    setStatus(
-      "Password created. A blog-config.js file was downloaded. Replace js/blog-config.js with it, then commit, so this lock works on every computer.",
-      "success"
-    );
+    try {
+      const hash = await hashPassword(password);
+      localStorage.setItem(STORAGE_KEYS.passwordHash, hash);
+      setUnlocked(true);
+      showApp();
+      refreshLockBanner();
+      setStatus(
+        "Password saved on this computer. Click “Download lock file” and replace js/blog-config.js, then commit.",
+        "success"
+      );
+    } catch (error) {
+      setupError.textContent = error.message || "Could not create the password.";
+    }
   });
 
   loginForm.addEventListener("submit", async function (event) {
     event.preventDefault();
     loginError.textContent = "";
-    const password = document.getElementById("login-password").value;
-    const hash = await hashPassword(password);
-    if (hash !== expectedPasswordHash()) {
-      loginError.textContent = "Wrong password.";
-      return;
+    try {
+      const password = document.getElementById("login-password").value;
+      const hash = await hashPassword(password);
+      if (hash !== expectedPasswordHash()) {
+        loginError.textContent = "Wrong password.";
+        return;
+      }
+      setUnlocked(true);
+      showApp();
+    } catch (error) {
+      loginError.textContent = error.message || "Could not check the password.";
     }
-    setUnlocked(true);
-    showApp();
   });
 
   document.getElementById("new-post-btn").addEventListener("click", function () {
@@ -315,10 +350,28 @@ function initWriter() {
   form.addEventListener("submit", function (event) {
     event.preventDefault();
   });
+
+  ["input", "change"].forEach(function (eventName) {
     form.addEventListener(eventName, function () {
       persistDraft();
       refreshPreview();
     });
+  });
+
+  document.getElementById("download-config").addEventListener("click", saveLockFile);
+  document.getElementById("copy-config").addEventListener("click", async function () {
+    const hash = expectedPasswordHash();
+    if (!hash) {
+      setStatus("Create a password first.", "error");
+      return;
+    }
+    const contents = serializeConfigFile(hash);
+    try {
+      await navigator.clipboard.writeText(contents);
+      setStatus("Copied. Paste it into js/blog-config.js and save that file.", "success");
+    } catch (error) {
+      setStatus("Could not copy. Download the lock file instead.", "error");
+    }
   });
 
   document.querySelectorAll("[data-md]").forEach(function (button) {

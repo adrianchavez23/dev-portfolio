@@ -202,6 +202,11 @@ function serializePostsFile(posts) {
 }
 
 async function hashPassword(password) {
+  if (!globalThis.crypto || !crypto.subtle || !crypto.subtle.digest) {
+    throw new Error(
+      "This browser blocked password hashing. Open write.html through a local server (not as a raw file), or use Chrome/Edge."
+    );
+  }
   const data = new TextEncoder().encode(password);
   const digest = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(digest))

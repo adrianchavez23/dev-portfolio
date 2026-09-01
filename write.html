@@ -60,6 +60,15 @@
             <p class="muted">Visitors never see this page in the menu. Publishing updates <code>data/posts.js</code>, which the public blog reads.</p>
             <p id="writer-status" class="writer-status"></p>
 
+            <div id="lock-file-banner" class="settings-panel hidden">
+                <h3>Save your writer lock</h3>
+                <p class="muted">The password is stored in this browser. Browsers often block automatic downloads, so save the lock file with a click. Replace <code>js/blog-config.js</code> with it, then commit.</p>
+                <div class="editor-buttons">
+                    <button type="button" id="download-config">Download lock file</button>
+                    <button type="button" id="copy-config" class="secondary-btn">Copy file contents</button>
+                </div>
+            </div>
+
             <div id="settings-panel" class="settings-panel hidden">
                 <h3>Optional: publish from the browser</h3>
                 <p class="muted">Create a GitHub fine-grained token with Contents read/write access only for this repo. It stays in this browser and is never committed with the site.</p>
